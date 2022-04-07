@@ -1,0 +1,34 @@
+  /*Title*/
+H1 {
+font-family: Arial;
+font-size: 36pt;
+color: #00667B;
+}
+  /*Headers*/
+H2 {
+font-family: Arial;
+font-size: 28pt;
+color: #00667B;
+}
+  /*Sub Header 1*/
+H3 {
+font-family: Arial Bold;
+font-size: 15pt;
+color: #00667B;
+}
+  /*Sub Header 2*/
+H4 {
+font-family: Arial Bold;
+font-size: 13pt;
+color: #00667B;
+}
+  /*Body*/
+P {
+font-family: Arial;
+font-size: 12pt;
+color: black;
+}
+
+/*DOH Green :#005B38
+HQIU Teal: #00667B
+*/
