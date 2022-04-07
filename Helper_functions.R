@@ -33,7 +33,7 @@ table_theme <- function(input_df){
     #fit size to whole screen
     autofit() %>%
     #background colour
-    bg(part="header", bg = "#005B38") %>%
+    bg(part="header", bg = "#00667B") %>%
     #text colour
     color(part = "header", color = "white") %>%
     bold(part = "header")
