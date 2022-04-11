@@ -5,7 +5,7 @@ centre_line_colour <- "black"
 #apply to funnel to use theme , p + hqiu_funnel_theme()
 hqiu_funnel_theme <- function(){
   theme(
-    legend.position = c(.6, .8), legend.background = element_blank(), legend.key = element_blank(), legend.direction = "horizontal",
+    legend.position = c(.5, 0.99), legend.background = element_blank(), legend.key = element_blank(), legend.direction = "horizontal",
     panel.background = element_blank(), plot.title=element_text(hjust=0.5), plot.subtitle=element_text(hjust=0.5),
     axis.ticks = element_blank(), plot.caption = element_text(face = "italic"), legend.title = element_text(face = "bold")
   )}
