@@ -27,36 +27,36 @@ fpl_create <- function(input_df){
   X <- 0
   {
   cut_off <- case_when(
-    squis_test$indicator[1] == "Q0009" ~ 25, #AMI
-    squis_test$indicator[1] == "Q0010" ~ 25, #Stroke
-    squis_test$indicator[1] == "Q0012" ~ 15, #Pneumonia
-    squis_test$indicator[1] == "Q0014" ~ 450, #HSMR
-    squis_test$indicator[1] == "Q0040" ~ 20, #FNOF
-    squis_test$indicator[1] == "Q0006" ~ 5, #Apgar
-    squis_test$indicator[1] == "Q0016" ~ 60, #C Section
-    squis_test$indicator[1] == "Q0004" ~ X, #Complaints Res 30 day - Higher is better
-    squis_test$indicator[1] == "Q0057" ~ X, #Hand Hygiene - Higher is better
-    squis_test$indicator[1] == "Q0101" ~ X, #Incident Patient Outcome Harm - Proportion
-    squis_test$indicator[1] == "Q0078" ~ 100, #Incident Reporting Rate - Unsure
-    squis_test$indicator[1] == "Q0003" ~ X, #Incidents Open Disclosure - Percentage
-    squis_test$indicator[1] == "Q0022" ~ X, #Incidents SAC1 Eval 6m - Percentage
-    squis_test$indicator[1] == "Q0120" ~ X, #Incidents SAC128 - Percentage
-    squis_test$indicator[1] == "Q0103" ~ X, #Induction Rate - Proportion
-    squis_test$indicator[1] == "Q0144" ~ X, #MH Consumer Experience - Higher is better
-    squis_test$indicator[1] == "Q0149" ~ X, #MH Outcomes Clinician rated IP - Change in value
-    squis_test$indicator[1] == "Q0148" ~ X, #MH Outcomes Consumer rated IP - Change in value
-    squis_test$indicator[1] == "Q0130" ~ X, #MH % ED Attendances Admitted <4hrs - Proportion
-    squis_test$indicator[1] == "Q0020" ~ 50, #Perinatal Mortality 
-    squis_test$indicator[1] == "Q0084" ~ X, #Post-partum Haemorrhage - Proportion
-    squis_test$indicator[1] == "Q0139" ~ 30, #Restraint Rates
-    squis_test$indicator[1] == "Q0140" ~ 30, #Seclusion Rates
-    squis_test$indicator[1] == "Q0127" ~ X, #Staff Committed To Safety - Proportion, Higher is better
-    squis_test$indicator[1] == "Q0128" ~ X, #Staff Feel Empowered - Proportion, Higher is better
-    squis_test$indicator[1] == "Q0129" ~ X, #Staff Friends And Family - Proportion, Higher is better
-    squis_test$indicator[1] == "Q0032" ~ X, #Staff Safe To Speak Up - Proportion, Higher is better
-    squis_test$indicator[1] == "Q0126" ~ X, #Staff Treated Fairly - Proportion, Higher is better
-    squis_test$indicator[1] == "Q0019" ~ 30, #Stillbirth 
-    squis_test$indicator[1] == "Q0121" ~ 30) #VBAC
+    input_df$indicator[1] == "Q0009" ~ 25, #AMI
+    input_df$indicator[1] == "Q0010" ~ 25, #Stroke
+    input_df$indicator[1] == "Q0012" ~ 15, #Pneumonia
+    input_df$indicator[1] == "Q0014" ~ 450, #HSMR
+    input_df$indicator[1] == "Q0040" ~ 20, #FNOF
+    input_df$indicator[1] == "Q0006" ~ 5, #Apgar
+    input_df$indicator[1] == "Q0016" ~ 60, #C Section
+    input_df$indicator[1] == "Q0004" ~ X, #Complaints Res 30 day - Higher is better
+    input_df$indicator[1] == "Q0057" ~ X, #Hand Hygiene - Higher is better
+    input_df$indicator[1] == "Q0101" ~ X, #Incident Patient Outcome Harm - Proportion
+    input_df$indicator[1] == "Q0078" ~ 100, #Incident Reporting Rate - Unsure
+    input_df$indicator[1] == "Q0003" ~ X, #Incidents Open Disclosure - Percentage
+    input_df$indicator[1] == "Q0022" ~ X, #Incidents SAC1 Eval 6m - Percentage
+    input_df$indicator[1] == "Q0120" ~ X, #Incidents SAC128 - Percentage
+    input_df$indicator[1] == "Q0103" ~ X, #Induction Rate - Proportion
+    input_df$indicator[1] == "Q0144" ~ X, #MH Consumer Experience - Higher is better
+    input_df$indicator[1] == "Q0149" ~ X, #MH Outcomes Clinician rated IP - Change in value
+    input_df$indicator[1] == "Q0148" ~ X, #MH Outcomes Consumer rated IP - Change in value
+    input_df$indicator[1] == "Q0130" ~ X, #MH % ED Attendances Admitted <4hrs - Proportion
+    input_df$indicator[1] == "Q0020" ~ 50, #Perinatal Mortality 
+    input_df$indicator[1] == "Q0084" ~ X, #Post-partum Haemorrhage - Proportion
+    input_df$indicator[1] == "Q0139" ~ 30, #Restraint Rates
+    input_df$indicator[1] == "Q0140" ~ 30, #Seclusion Rates
+    input_df$indicator[1] == "Q0127" ~ X, #Staff Committed To Safety - Proportion, Higher is better
+    input_df$indicator[1] == "Q0128" ~ X, #Staff Feel Empowered - Proportion, Higher is better
+    input_df$indicator[1] == "Q0129" ~ X, #Staff Friends And Family - Proportion, Higher is better
+    input_df$indicator[1] == "Q0032" ~ X, #Staff Safe To Speak Up - Proportion, Higher is better
+    input_df$indicator[1] == "Q0126" ~ X, #Staff Treated Fairly - Proportion, Higher is better
+    input_df$indicator[1] == "Q0019" ~ 30, #Stillbirth 
+    input_df$indicator[1] == "Q0121" ~ 30) #VBAC
   }
   
   plot <- ggplot(funnel_test$plot$data, aes(x=denominator, y = funnel_test$plot$data$rr*input_df$multiplier[1]))+
