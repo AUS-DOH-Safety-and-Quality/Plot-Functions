@@ -16,7 +16,7 @@ num_den_table <- function(input_df){
     #Transpose
     t() %>%
     #turns colnames into variables
-    as_tibble(rownames = "x")
+    as_tibble(rownames = "x", .name_repair = "minimal")
   # Uses the table we just created, passes it to the create table function
   # and adds a custom theme we created for HQIU (see theme chunk for settings)
   num_den_table %>%
