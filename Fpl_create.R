@@ -80,10 +80,10 @@ fpl_create <- function(input_df){
   #if Lower, set it to points above the upper 99 limit
   if (input_df$betteris[1] == "Higher"){
     #if point value is less than the lower control limit flag the point
-    highlight_points <- ifelse(funnel_test$plot$data$rr*squis_test$multiplier[1] < fpl_plot$data$LCL99,
-                               funnel_test$plot$data$rr*squis_test$multiplier[1], NA)
-  }else highlight_points <- ifelse(funnel_test$plot$data$rr*squis_test$multiplier[1] > fpl_plot$data$UCL99,
-                                   funnel_test$plot$data$rr*squis_test$multiplier[1], NA)
+    highlight_points <- ifelse(funnel_test$plot$data$rr*input_df$multiplier[1] < fpl_plot$data$LCL99,
+                               funnel_test$plot$data$rr*input_df$multiplier[1], NA)
+  }else highlight_points <- ifelse(funnel_test$plot$data$rr*input_df$multiplier[1] > fpl_plot$data$UCL99,
+                                   funnel_test$plot$data$rr*input_df$multiplier[1], NA)
   #filter the input df to only show establishments that are outliers
   outlier_label <- filter(input_df, establishment %in% funnel_test$plot$data$group)
   #create a dataframe that holds the establishment and hospital names to serve as a lookup table
