@@ -1,5 +1,4 @@
-#Insert dataframe that is filtered for indicator, establishment and current, return spc plot
-spc_create <- function(input_df, patterns_df = "No") {
+function(input_df, patterns_df = "No") {
 
   #spc does not work with 0 or 1 rows
   if (!nrow(input_df) | nrow(input_df) == 1) return(cat("", "Skipped", input_df$establishment[1], input_df$indicator[1], sep = " "))
@@ -28,7 +27,8 @@ spc_create <- function(input_df, patterns_df = "No") {
   # Pull out the data from the ggplot2 object hqiu_spc
   hqiu_spc_df <- hqiu_spc$data
   #Clear NaN and Inf values from cl to determine if spc was successful
-  hqiu_spc_df <- mutate(hqiu_spc_df, across(.cols = ucl.95, .fns = clear_na))
+  hqiu_spc_df <- mutate(hqiu_spc_df, across(.cols = ucl.95, .fns = clear_na)) %>%
+    drop_na(y)
   #SPC Plot
 
   #Checks if confidence limits are below 0, if so set to 0, as negative values are not possible
@@ -75,9 +75,9 @@ spc_create <- function(input_df, patterns_df = "No") {
       pat_info <- filter(hqiu_spc_df, x == filt_pat[[i]])
       hqiu_spc_plot <- hqiu_spc_plot +
         geom_point(pat_info, mapping = aes(x = x, y = y), colour = "red", size = 8, shape = 1) #+
-        #geom_text_repel(pat_info, mapping = aes(x = x, y = y), label = filt_pat, point.size = 4)
+      #geom_text_repel(pat_info, mapping = aes(x = x, y = y), label = filt_pat, point.size = 4)
+    }
   }
-}
 
   hqiu_spc_plot
 }
