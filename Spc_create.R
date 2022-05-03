@@ -1,4 +1,4 @@
-function(input_df, patterns_df = "No") {
+spc_create <- function(input_df, patterns_df = "No") {
 
   #spc does not work with 0 or 1 rows
   if (!nrow(input_df) | nrow(input_df) == 1) return(cat("", "Skipped", input_df$establishment[1], input_df$indicator[1], sep = " "))
