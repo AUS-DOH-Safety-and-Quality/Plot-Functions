@@ -74,7 +74,7 @@ spc_create <- function(input_df, patterns_df = "No") {
     if(!is.na(filt_pat[[i]])) {
       pat_info <- filter(hqiu_spc_df, x == filt_pat[[i]])
       hqiu_spc_plot <- hqiu_spc_plot +
-        geom_point(pat_info, mapping = aes(x = x, y = y), colour = "red", size = 8, shape = 1) #+
+        geom_point(pat_info, mapping = aes(x = x, y = y), colour = "yellow", size = 8, shape = 1) #+
       #geom_text_repel(pat_info, mapping = aes(x = x, y = y), label = filt_pat, point.size = 4)
     }
   }

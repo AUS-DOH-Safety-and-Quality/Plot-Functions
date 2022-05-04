@@ -97,7 +97,7 @@ fpl_create <- function(input_df){
   #join the two tables
   outlier_lookup <- left_join(outlier_points, outlier_label, by ="establishment")
   #Add a point geom, over the top of outliers, that is a red hollow circle
-  fpl_plot <- fpl_plot + geom_point(data = outlier_lookup, aes(x = x, y = y), colour = "red", size = 5, shape = 1)+
+  fpl_plot <- fpl_plot + geom_point(data = outlier_lookup, aes(x = x, y = y), colour = "yellow", size = 5, shape = 1)+
     #add a text geom, over the top of outliers, that is text relaying the name of the hospital for that outlier
     geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$hospital_name)
 
