@@ -1,5 +1,5 @@
 #Input data frame filtered to indicator and current funnel, cut off value for the height of the y value added manually, to be added as a column in data
-fpl_create <- function(input_df){
+fpl_create <- function(input_df, highlight_hosp = "No"){
   funnel_test <- funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
                              group = input_df$establishment, limit=99,
                              data_type = input_df$funnelcharttype[1], sr_method = "CQC", multiplier = input_df$multiplier[1],
@@ -84,12 +84,12 @@ fpl_create <- function(input_df){
                                funnel_test$plot$data$rr*input_df$multiplier[1], NA)
   }else highlight_points <- ifelse(funnel_test$plot$data$rr*input_df$multiplier[1] > fpl_plot$data$UCL99,
                                    funnel_test$plot$data$rr*input_df$multiplier[1], NA)
-  #filter the input df to only show establishments that are outliers
-  outlier_label <- filter(input_df, establishment %in% funnel_test$plot$data$group)
+
   #create a dataframe that holds the establishment and hospital names to serve as a lookup table
   #We only have the establishment code in the plot output so we need this to find the hospital name
-  outlier_label <- data.frame(establishment = unique(outlier_label$establishment),
-                              hospital_name = as.factor(unique(outlier_label$threeletteracronym)))
+  outlier_label <- data.frame(establishment = unique(input_df$establishment),
+                              threeletteracronym = unique(input_df$threeletteracronym),
+                              shorthospitalname = unique(input_df$shorthospitalname))
   #create a dataframe that holds the points on the graph, so that we can overlay them with a circle and hospital name
   outlier_points <- data.frame(x = funnel_test$plot$data$denominator, y = highlight_points, establishment = funnel_test$plot$data$group) %>%
     #drop values that aren't outliers
@@ -97,9 +97,17 @@ fpl_create <- function(input_df){
   #join the two tables
   outlier_lookup <- left_join(outlier_points, outlier_label, by ="establishment")
   #Add a point geom, over the top of outliers, that is a red hollow circle
-  fpl_plot <- fpl_plot + geom_point(data = outlier_lookup, aes(x = x, y = y), colour = "yellow", size = 5, shape = 1)+
+  fpl_plot <- fpl_plot + geom_point(data = outlier_lookup, aes(x = x, y = y), colour = "blue", size = 5, shape = 1)+
     #add a text geom, over the top of outliers, that is text relaying the name of the hospital for that outlier
-    geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$hospital_name)
+    geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$threeletteracronym)
+
+  if(highlight_hosp %in% unique(input_df$shorthospitalname)){
+    highlight <- filter(outlier_label, shorthospitalname == highlight_hosp)
+    highlight_point <- left_join(highlight, fpl_plot$data, by = c("establishment" = "group"))
+      fpl_plot <- fpl_plot +
+      geom_point(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), colour = "black", size = 5, shape = 1) +
+      geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, nudge_y = (centre_line/2))
+  }
 
   #temporary manual cut of limits until new row finalised
   if(cut_off != 0){
