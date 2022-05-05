@@ -74,7 +74,8 @@ fpl_create <- function(input_df, highlight_hosp = "No"){
          subtitle = date_range,
          caption = "Source: Healthcare Quality Intelligence Unit",
          x = "",
-         y = input_df$y_axis_label[1])
+         y = input_df$y_axis_label[1])+
+    scale_x_continuous(labels = scales::comma)
 
   #check betteris, if higher, set highlight points to be points that are below the lower 99 limit, else,
   #if Lower, set it to points above the upper 99 limit

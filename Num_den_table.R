@@ -1,11 +1,11 @@
 #input dataframe filtered to indicator, establishment and current funnel, output numerator, denominator and value table
 num_den_table <- function(input_df){
 
-  # This table only shows the last 12 months, where the SPC shows 3 years (typically),
-  # so let's take the last 12 values
   num_den_df <- input_df %>%
-    mutate(value = round((numerator/denominator)*multiplier, 2))
+    mutate(value = format(round((numerator/denominator)*multiplier, 2),nsmall = 2))
   num_den_df <- arrange(num_den_df, period_end)
+  num_den_df$value <- if_else(num_den_df$value == " NaN", "0.00", num_den_df$value)
+  num_den_df$value <- if_else(num_den_df$value == "NaN", "Test", num_den_df$value)
   #Rounding up for probabilities for outcomes
   num_den_df$denominator <- round(num_den_df$denominator, 2)
   # Reformat the date column for our preferred style (e.g. Oct 21)
