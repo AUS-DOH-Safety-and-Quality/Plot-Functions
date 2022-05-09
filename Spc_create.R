@@ -64,20 +64,15 @@ spc_create <- function(input_df, patterns_df = "No") {
   filt_pat <- filter(patterns_df, Indicator == input_df$descriptionshort[1], Hospital == input_df$shorthospitalname[1])
   #if not return the normal plot
   if(!nrow(filt_pat)) return(hqiu_spc_plot)
-
-  pats <- c("Astro", "Trend", "Shift", "TwoInThree")
-  labels <- c("A", "T", "S", "TT")
-  pats_labels <- tibble(pats, labels)
-
-  #if a pattern was detected, circle the point and tag it
-  for(i in pats_labels$pats){
-    if(!is.na(filt_pat[[i]])) {
-      pat_info <- filter(hqiu_spc_df, x == filt_pat[[i]])
-      hqiu_spc_plot <- hqiu_spc_plot +
-        geom_point(pat_info, mapping = aes(x = x, y = y), colour = "blue", size = 8, shape = 1) #+
-      #geom_text_repel(pat_info, mapping = aes(x = x, y = y), label = filt_pat, point.size = 4)
-    }
+  #filter columns to only those that are related to patterns, x and y co-ordinates
+  pattern_info <- filter(hqiu_spc_df, hqiu_spc_df$x %in% filt_pat[3:6]) %>%
+    subset(select = c(x, y))
+  #creates a dataframe that has the dates of patterns as well as the pattern name for the current spc
+  pat_info <- tibble(value = c(filt_pat$Astro, filt_pat$Trend, filt_pat$TwoInThree, filt_pat$Shift), Pattern = c("A", "T", "TT", "S")) %>% drop_na()
+  #joins the two dataframes to now hold the x, y and pattern identifier
+  pat_agg <- left_join(pat_info, pattern_info, by = c("value" = "x"))
+  #Adds the circle and tag around points
+  hqiu_spc_plot +
+    geom_point(pat_agg, mapping = aes(x = value, y = y), colour = "blue", size = 8, shape = 1) +
+    geom_text_repel(pat_agg, mapping = aes(x=value,y=y), label = pat_agg$Pattern)
   }
-
-  hqiu_spc_plot
-}
