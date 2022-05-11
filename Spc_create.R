@@ -74,5 +74,5 @@ spc_create <- function(input_df, patterns_df = "No") {
   #Adds the circle and tag around points
   hqiu_spc_plot +
     geom_point(pat_agg, mapping = aes(x = value, y = y), colour = "blue", size = 8, shape = 1) +
-    geom_text_repel(pat_agg, mapping = aes(x=value,y=y), label = pat_agg$Pattern)
+    geom_text_repel(pat_agg, mapping = aes(x=value,y=y), label = pat_agg$Pattern, point.size = 5)
   }
