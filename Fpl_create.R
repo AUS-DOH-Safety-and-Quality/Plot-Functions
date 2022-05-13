@@ -1,5 +1,6 @@
 #Input data frame filtered to indicator and current funnel, cut off value for the height of the y value added manually, to be added as a column in data
-fpl_create <- function(input_df, highlight_hosp = "No"){
+fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE){
+  if (!nrow(input_df) | nrow(input_df) == 1) return()
   funnel_test <- funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
                              group = input_df$establishment, limit=99,
                              data_type = input_df$funnelcharttype[1], sr_method = "CQC", multiplier = input_df$multiplier[1],
@@ -97,19 +98,19 @@ fpl_create <- function(input_df, highlight_hosp = "No"){
     drop_na(y)
   #join the two tables
   outlier_lookup <- left_join(outlier_points, outlier_label, by ="establishment")
+  if (highlight_outlier == TRUE){
   #Add a point geom, over the top of outliers, that is a red hollow circle
   fpl_plot <- fpl_plot + geom_point(data = outlier_lookup, aes(x = x, y = y), colour = "blue", size = 5, shape = 1)+
     #add a text geom, over the top of outliers, that is text relaying the name of the hospital for that outlier
     geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$threeletteracronym)
-
+  }
   if(highlight_hosp %in% unique(input_df$shorthospitalname)){
     highlight <- filter(outlier_label, shorthospitalname == highlight_hosp)
     highlight_point <- left_join(highlight, fpl_plot$data, by = c("establishment" = "group"))
       fpl_plot <- fpl_plot +
       geom_point(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), colour = "black", size = 5, shape = 1) +
-      geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, nudge_y = (centre_line/2))
-  }
-
+      geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, point.size = 7)
+    }
   #temporary manual cut of limits until new row finalised
   if(cut_off != 0){
     fpl_plot + coord_cartesian(ylim = c(0,cut_off))

@@ -67,12 +67,15 @@ spc_create <- function(input_df, patterns_df = "No") {
   #filter columns to only those that are related to patterns, x and y co-ordinates
   pattern_info <- filter(hqiu_spc_df, hqiu_spc_df$x %in% filt_pat[3:6]) %>%
     subset(select = c(x, y))
+  test <- include_graphics("C:/Users/he198926/Desktop/E.png")
   #creates a dataframe that has the dates of patterns as well as the pattern name for the current spc
-  pat_info <- tibble(value = c(filt_pat$Astro, filt_pat$Trend, filt_pat$TwoInThree, filt_pat$Shift), Pattern = c("A", "T", "TT", "S")) %>% drop_na()
+  pat_info <- tibble(value = c(filt_pat$Astro, filt_pat$Trend, filt_pat$TwoInThree, filt_pat$Shift),
+                     Pattern = c("\u2252", "\u24e3", "TT" , "\u24e2"))%>%
+                       drop_na()
   #joins the two dataframes to now hold the x, y and pattern identifier
   pat_agg <- left_join(pat_info, pattern_info, by = c("value" = "x"))
   #Adds the circle and tag around points
   hqiu_spc_plot +
-    geom_point(pat_agg, mapping = aes(x = value, y = y), colour = "blue", size = 8, shape = 1) +
-    geom_text_repel(pat_agg, mapping = aes(x=value,y=y), label = pat_agg$Pattern, point.size = 5)
+    geom_point(pat_agg, mapping = aes(x = value, y = y), colour = "orange", size = 8, shape = 21, stroke = 2) +
+    geom_text_repel(pat_agg, mapping = aes(x=value,y=y), label = pat_agg$Pattern, point.size = 5, family = "Wingdings")
   }
