@@ -51,31 +51,37 @@ spc_create <- function(input_df, patterns_df = "No") {
     geom_line(aes (y = lcl), color = brand_colour, linetype = 5, size = 1) +
     # Add the lower control limit
     geom_line(aes (y = lcl.95), color = brand_colour, linetype = 3, size = 1) +
-    #labels
+    #labels, see start of chunk for setup
     labs (x = "", y = "Value",
-          title = spc_heading, # See start of chunk for setup
+          title = spc_heading,
           subtitle = spc_sub_heading,
           caption = "Source: Healthcare Quality Intelligence Unit")+
     hqiu_theme()
 
-  #checks if a patterns dataframe is input
-  if(!is.data.frame(patterns_df)) return(hqiu_spc_plot)
-  #filters the patterns dataframe to see if the current input df is an spc to be displayed
-  filt_pat <- filter(patterns_df, Indicator == input_df$descriptionshort[1], Hospital == input_df$shorthospitalname[1])
-  #if not return the normal plot
-  if(!nrow(filt_pat)) return(hqiu_spc_plot)
-  #filter columns to only those that are related to patterns, x and y co-ordinates
-  pattern_info <- filter(hqiu_spc_df, hqiu_spc_df$x %in% filt_pat[3:6]) %>%
-    subset(select = c(x, y))
-  test <- include_graphics("C:/Users/he198926/Desktop/E.png")
-  #creates a dataframe that has the dates of patterns as well as the pattern name for the current spc
-  pat_info <- tibble(value = c(filt_pat$Astro, filt_pat$Trend, filt_pat$TwoInThree, filt_pat$Shift),
-                     Pattern = c("\u2252", "\u24e3", "TT" , "\u24e2"))%>%
-                       drop_na()
-  #joins the two dataframes to now hold the x, y and pattern identifier
-  pat_agg <- left_join(pat_info, pattern_info, by = c("value" = "x"))
-  #Adds the circle and tag around points
-  hqiu_spc_plot +
-    geom_point(pat_agg, mapping = aes(x = value, y = y), colour = "orange", size = 8, shape = 21, stroke = 2) +
-    geom_text_repel(pat_agg, mapping = aes(x=value,y=y), label = pat_agg$Pattern, point.size = 5, family = "Wingdings")
+  #checks if a patterns dataframe is input and if any patterns were detected
+  if(is.data.frame(patterns_df)){
+    #filters the patterns dataframe to see if the current input df is an spc to be displayed
+    filt_pat <- filter(patterns_df, Indicator == input_df$descriptionshort[1], Hospital == input_df$shorthospitalname[1])
+    if(nrow(filt_pat)){
+      #filter columns to only those that are related to patterns, x and y co-ordinates
+      pattern_info <- filter(hqiu_spc_df, hqiu_spc_df$x %in% filt_pat[3:6]) %>%
+        subset(select = c(x, y))
+      #creates a dataframe that has the dates of patterns as well as the pattern name for the current spc
+      pat_info <- tibble(value = c(filt_pat$Astro, filt_pat$Trend, filt_pat$TwoInThree, filt_pat$Shift),
+                         Pattern = c("\u2252", "\u24e3", "TT" , "\u24e2"))%>%
+        drop_na()
+      #joins the two dataframes to now hold the x, y and pattern identifier
+      pat_agg <- left_join(pat_info, pattern_info, by = c("value" = "x"))
+
+      if(input_df$betteris[1] == "Lower") nudge_y <- max(hqiu_spc_df$y)/10 else nudge_y <- -max(hqiu_spc_df$y)/10
+      #enables rendering of Unicode symbols
+      showtext_begin()
+      hqiu_spc_plot <- hqiu_spc_plot +
+        #Adds the circle and tag around points
+        geom_point(data = pat_agg, mapping = aes(x = value, y = y), colour = "orange", size = 8, shape = 21, stroke = 2) +
+        geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 6, nudge_y = nudge_y)
+      showtext_end()
+    }
   }
+  hqiu_spc_plot
+}
