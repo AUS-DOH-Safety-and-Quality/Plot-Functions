@@ -73,14 +73,12 @@ spc_create <- function(input_df, patterns_df = "No") {
       #joins the two dataframes to now hold the x, y and pattern identifier
       pat_agg <- left_join(pat_info, pattern_info, by = c("value" = "x"))
 
-      if(input_df$betteris[1] == "Lower") nudge_y <- max(hqiu_spc_df$y)/10 else nudge_y <- -max(hqiu_spc_df$y)/10
+      if(input_df$betteris[1] == "Lower") nudge_y <- -max(hqiu_spc_df$y)/10 else nudge_y <- max(hqiu_spc_df$y)/10
       #enables rendering of Unicode symbols
-      showtext_begin()
       hqiu_spc_plot <- hqiu_spc_plot +
         #Adds the circle and tag around points
         geom_point(data = pat_agg, mapping = aes(x = value, y = y), colour = "orange", size = 8, shape = 21, stroke = 2) +
         geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 6, nudge_y = nudge_y)
-      showtext_end()
     }
   }
   hqiu_spc_plot
