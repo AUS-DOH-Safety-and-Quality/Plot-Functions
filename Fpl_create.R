@@ -102,14 +102,14 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
   #Add a point geom, over the top of outliers, that is a red hollow circle
   fpl_plot <- fpl_plot + geom_point(data = outlier_lookup, aes(x = x, y = y), colour = "blue", size = 5, shape = 1)+
     #add a text geom, over the top of outliers, that is text relaying the name of the hospital for that outlier
-    geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$threeletteracronym)
+    ggrepel::geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$threeletteracronym)
   }
   if(highlight_hosp %in% unique(input_df$shorthospitalname)){
     highlight <- filter(outlier_label, shorthospitalname == highlight_hosp)
     highlight_point <- left_join(highlight, fpl_plot$data, by = c("establishment" = "group"))
       fpl_plot <- fpl_plot +
       geom_point(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), colour = "black", size = 5, shape = 1) +
-      geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, point.size = 7)
+      ggrepel::geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, point.size = 7)
     }
   #temporary manual cut of limits until new row finalised
   if(cut_off != 0){
