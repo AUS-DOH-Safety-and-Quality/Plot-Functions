@@ -77,7 +77,7 @@ spc_create <- function(input_df, patterns_df = "No") {
       #enables rendering of Unicode symbols
       hqiu_spc_plot <- hqiu_spc_plot +
         #Adds the circle and tag around points
-        geom_point(data = pat_agg, mapping = aes(x = value, y = y), colour = "orange", size = 8, shape = 21, stroke = 2) +
+        geom_point(data = pat_agg, mapping = aes(x = value, y = y), colour = "pink", size = 8, shape = 21, stroke = 2) +
         ggrepel::geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 6, nudge_y = nudge_y)
     }
   }

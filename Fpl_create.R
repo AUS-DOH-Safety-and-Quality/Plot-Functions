@@ -25,9 +25,8 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
   }
   centre_line <- centre_line * input_df$multiplier[1]
 
-  X <- 0
   {
-  cut_off <- case_when(
+  cut_off_max <- case_when(
     input_df$indicator[1] == "Q0009" ~ 25, #AMI
     input_df$indicator[1] == "Q0010" ~ 25, #Stroke
     input_df$indicator[1] == "Q0012" ~ 15, #Pneumonia
@@ -35,30 +34,38 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
     input_df$indicator[1] == "Q0040" ~ 20, #FNOF
     input_df$indicator[1] == "Q0006" ~ 5, #Apgar
     input_df$indicator[1] == "Q0016" ~ 60, #C Section
-    input_df$indicator[1] == "Q0004" ~ X, #Complaints Res 30 day - Higher is better
-    input_df$indicator[1] == "Q0057" ~ X, #Hand Hygiene - Higher is better
-    input_df$indicator[1] == "Q0101" ~ X, #Incident Patient Outcome Harm - Proportion
+    #input_df$indicator[1] == "Q0004" ~ X, #Complaints Res 30 day - Higher is better
+    #input_df$indicator[1] == "Q0057" ~ X, #Hand Hygiene - Higher is better
+    #input_df$indicator[1] == "Q0101" ~ X, #Incident Patient Outcome Harm - Proportion
     input_df$indicator[1] == "Q0078" ~ 100, #Incident Reporting Rate - Unsure
-    input_df$indicator[1] == "Q0003" ~ X, #Incidents Open Disclosure - Percentage
-    input_df$indicator[1] == "Q0022" ~ X, #Incidents SAC1 Eval 6m - Percentage
-    input_df$indicator[1] == "Q0120" ~ X, #Incidents SAC128 - Percentage
-    input_df$indicator[1] == "Q0103" ~ X, #Induction Rate - Proportion
-    input_df$indicator[1] == "Q0144" ~ X, #MH Consumer Experience - Higher is better
-    input_df$indicator[1] == "Q0149" ~ X, #MH Outcomes Clinician rated IP - Change in value
-    input_df$indicator[1] == "Q0148" ~ X, #MH Outcomes Consumer rated IP - Change in value
-    input_df$indicator[1] == "Q0130" ~ X, #MH % ED Attendances Admitted <4hrs - Proportion
+    #input_df$indicator[1] == "Q0003" ~ X, #Incidents Open Disclosure - Percentage
+    # input_df$indicator[1] == "Q0022" ~ X, #Incidents SAC1 Eval 6m - Percentage
+    # input_df$indicator[1] == "Q0120" ~ X, #Incidents SAC128 - Percentage
+    # input_df$indicator[1] == "Q0103" ~ X, #Induction Rate - Proportion
+    # input_df$indicator[1] == "Q0144" ~ X, #MH Consumer Experience - Higher is better
+    # input_df$indicator[1] == "Q0149" ~ X, #MH Outcomes Clinician rated IP - Change in value
+    # input_df$indicator[1] == "Q0148" ~ X, #MH Outcomes Consumer rated IP - Change in value
+    # input_df$indicator[1] == "Q0130" ~ X, #MH % ED Attendances Admitted <4hrs - Proportion
     input_df$indicator[1] == "Q0020" ~ 50, #Perinatal Mortality
-    input_df$indicator[1] == "Q0084" ~ X, #Post-partum Haemorrhage - Proportion
+    #input_df$indicator[1] == "Q0084" ~ X, #Post-partum Haemorrhage - Proportion
     input_df$indicator[1] == "Q0139" ~ 30, #Restraint Rates
     input_df$indicator[1] == "Q0140" ~ 30, #Seclusion Rates
-    input_df$indicator[1] == "Q0127" ~ X, #Staff Committed To Safety - Proportion, Higher is better
-    input_df$indicator[1] == "Q0128" ~ X, #Staff Feel Empowered - Proportion, Higher is better
-    input_df$indicator[1] == "Q0129" ~ X, #Staff Friends And Family - Proportion, Higher is better
-    input_df$indicator[1] == "Q0032" ~ X, #Staff Safe To Speak Up - Proportion, Higher is better
-    input_df$indicator[1] == "Q0126" ~ X, #Staff Treated Fairly - Proportion, Higher is better
+    # input_df$indicator[1] == "Q0127" ~ X, #Staff Committed To Safety - Proportion, Higher is better
+    # input_df$indicator[1] == "Q0128" ~ X, #Staff Feel Empowered - Proportion, Higher is better
+    # input_df$indicator[1] == "Q0129" ~ X, #Staff Friends And Family - Proportion, Higher is better
+    # input_df$indicator[1] == "Q0032" ~ X, #Staff Safe To Speak Up - Proportion, Higher is better
+    # input_df$indicator[1] == "Q0126" ~ X, #Staff Treated Fairly - Proportion, Higher is better
     input_df$indicator[1] == "Q0019" ~ 30, #Stillbirth
-    input_df$indicator[1] == "Q0121" ~ 30) #VBAC
-  }
+    input_df$indicator[1] == "Q0121" ~ 30, #VBAC
+    TRUE ~ 0)
+
+  cut_off_min <- case_when(
+    input_df$indicator[1] == "Q0127" ~ 0.5, #Staff Committed To Safety - Proportion, Higher is better
+    input_df$indicator[1] == "Q0128" ~ 0.5, #Staff Feel Empowered - Proportion, Higher is better
+    input_df$indicator[1] == "Q0129" ~ 0.5, #Staff Friends And Family - Proportion, Higher is better
+    input_df$indicator[1] == "Q0057" ~ 0.7, #Hand Hygiene - Higher is better
+    TRUE ~ 0)
+    }
 
   fpl_plot <- ggplot(funnel_test$plot$data, aes(x=denominator, y = funnel_test$plot$data$rr*input_df$multiplier[1]))+
     hqiu_funnel_theme()+
@@ -111,9 +118,15 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
       geom_point(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), colour = "black", size = 5, shape = 1) +
       ggrepel::geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, point.size = 7)
     }
-  #temporary manual cut of limits until new row finalised
-  if(cut_off != 0){
-    fpl_plot + coord_cartesian(ylim = c(0,cut_off))
-  }else fpl_plot
+  #cut off limits
+  if (cut_off_min != 0){
+    return(fpl_plot + coord_cartesian(ylim = c(cut_off_min, 1)))
+  }
+
+  if (cut_off_max != 0){
+    return(fpl_plot + coord_cartesian(ylim = c(0, cut_off_max)))
+  }
+  fpl_plot
+
   #R by default returns final line ran
 }
