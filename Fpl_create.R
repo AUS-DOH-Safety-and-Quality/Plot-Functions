@@ -1,7 +1,7 @@
 #Input data frame filtered to indicator and current funnel, cut off value for the height of the y value added manually, to be added as a column in data
 fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE){
   if (!nrow(input_df) | nrow(input_df) == 1) return()
-  funnel_test <- funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
+  funnel_test <- FunnelPlotR::funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
                              group = input_df$establishment, limit=99,
                              data_type = input_df$funnelcharttype[1], sr_method = "CQC", multiplier = input_df$multiplier[1],
                              draw_unadjusted = TRUE,
@@ -82,9 +82,9 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
          subtitle = date_range,
          caption = "Source: Healthcare Quality Intelligence Unit",
          x = "",
-         y = input_df$y_axis_label[1])+
+         y = "Proportion")+
     scale_x_continuous(labels = scales::comma)
-
+  #input_df$y_axis_label[1]
   #check betteris, if higher, set highlight points to be points that are below the lower 99 limit, else,
   #if Lower, set it to points above the upper 99 limit
   if (input_df$betteris[1] == "Higher"){

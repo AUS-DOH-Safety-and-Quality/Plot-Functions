@@ -6,7 +6,7 @@ spc_create <- function(input_df, patterns_df = "No") {
   if(sum(input_df$numerator) == 0 & sum(input_df$denominator) == 0) return(cat("", "Skipped", input_df$establishment[1], input_df$indicator[1], sep = " "))
 
   # Set the spc chart headings
-  spc_heading <- paste(input_df$descriptionshort[1], input_df$threeletteracronym, sep = " - ")
+  spc_heading <- paste(input_df$descriptionshort[1], input_df$shorthospitalname, sep = " - ")
   spc_period_start <- min(input_df$period_start)
   spc_period_end   <- max(input_df$period_end)
   spc_sub_heading <- paste(format(spc_period_start, format = "%b-%y"), format(spc_period_end, format = "%b-%y"), sep = " to ")
@@ -78,7 +78,7 @@ spc_create <- function(input_df, patterns_df = "No") {
       hqiu_spc_plot <- hqiu_spc_plot +
         #Adds the circle and tag around points
         geom_point(data = pat_agg, mapping = aes(x = value, y = y), colour = "pink", size = 8, shape = 21, stroke = 2) +
-        ggrepel::geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 6, nudge_y = nudge_y)
+        ggrepel::geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 10, nudge_y = nudge_y)
     }
   }
   hqiu_spc_plot

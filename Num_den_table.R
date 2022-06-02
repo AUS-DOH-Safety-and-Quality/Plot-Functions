@@ -11,8 +11,8 @@ num_den_table <- function(input_df){
   # Reformat the date column for our preferred style (e.g. Oct 21)
   num_den_df$period_end <- format(num_den_df$period_end, format = "%b %y")
   # select the columns we need and transpose them
-  num_den_table <- dplyr::select(num_den_df, "Date" = period_end, "Observed" = numerator,
-                                  "Expected" = denominator, "Value" = value) %>%
+  num_den_table <- dplyr::select(num_den_df, "Date" = period_end, "Numerator" = numerator,
+                                  "Denominator" = denominator, "Value" = value) %>%
     #Transpose
     t() %>%
     #turns colnames into variables
