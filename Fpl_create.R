@@ -26,12 +26,13 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
   centre_line <- centre_line * input_df$multiplier[1]
 
   {
+
   cut_off_max <- case_when(
-    input_df$indicator[1] == "Q0009" ~ 25, #AMI
-    input_df$indicator[1] == "Q0010" ~ 25, #Stroke
-    input_df$indicator[1] == "Q0012" ~ 15, #Pneumonia
-    input_df$indicator[1] == "Q0014" ~ 450, #HSMR
-    input_df$indicator[1] == "Q0040" ~ 20, #FNOF
+    input_df$indicator[1] == "Q0009" ~ 50, #AMI
+    input_df$indicator[1] == "Q0010" ~ 50, #Stroke
+    input_df$indicator[1] == "Q0012" ~ 30, #Pneumonia
+    input_df$indicator[1] == "Q0014" ~ 550, #HSMR
+    input_df$indicator[1] == "Q0040" ~ 40, #FNOF
     input_df$indicator[1] == "Q0006" ~ 5, #Apgar
     input_df$indicator[1] == "Q0016" ~ 60, #C Section
     #input_df$indicator[1] == "Q0004" ~ X, #Complaints Res 30 day - Higher is better
@@ -82,12 +83,12 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
          subtitle = date_range,
          caption = "Source: Healthcare Quality Intelligence Unit",
          x = "",
-         y = "Proportion")+
+         y = "Value")+
     scale_x_continuous(labels = scales::comma)
   #input_df$y_axis_label[1]
   #check betteris, if higher, set highlight points to be points that are below the lower 99 limit, else,
   #if Lower, set it to points above the upper 99 limit
-  if (input_df$betteris[1] == "Higher"){
+  if(input_df$betteris[1] == "Higher"){
     #if point value is less than the lower control limit flag the point
     highlight_points <- ifelse(funnel_test$plot$data$rr*input_df$multiplier[1] < fpl_plot$data$LCL99,
                                funnel_test$plot$data$rr*input_df$multiplier[1], NA)
@@ -127,6 +128,4 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
     return(fpl_plot + coord_cartesian(ylim = c(0, cut_off_max)))
   }
   fpl_plot
-
-  #R by default returns final line ran
 }

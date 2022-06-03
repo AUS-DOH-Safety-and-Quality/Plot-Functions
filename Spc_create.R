@@ -1,27 +1,26 @@
 spc_create <- function(input_df, patterns_df = "No") {
-
+  squis_spc <- input_df
   #spc does not work with 0 or 1 rows
-  if (!nrow(input_df) | nrow(input_df) == 1) return(cat("", "Skipped", input_df$establishment[1], input_df$indicator[1], sep = " "))
+  if (!nrow(squis_spc) | nrow(squis_spc) == 1) return(cat("", "Skipped", squis_spc$establishment[1], squis_spc$indicator[1], sep = " "))
   #check if unique establishment-indicator set has any values, if not skip this iteration
-  if(sum(input_df$numerator) == 0 & sum(input_df$denominator) == 0) return(cat("", "Skipped", input_df$establishment[1], input_df$indicator[1], sep = " "))
+  if(sum(squis_spc$numerator) == 0 & sum(squis_spc$denominator) == 0) return(cat("", "Skipped", squis_spc$establishment[1], squis_spc$indicator[1], sep = " "))
+
+  squis_spc$denominator<- if_else(squis_spc$denominator < 0.1, 0.1, squis_spc$denominator)
 
   # Set the spc chart headings
-  spc_heading <- paste(input_df$descriptionshort[1], input_df$shorthospitalname, sep = " - ")
-  spc_period_start <- min(input_df$period_start)
-  spc_period_end   <- max(input_df$period_end)
+  spc_heading <- paste(squis_spc$descriptionshort[1], squis_spc$shorthospitalname, sep = " - ")
+  spc_period_start <- min(squis_spc$period_start)
+  spc_period_end   <- max(squis_spc$period_end)
   spc_sub_heading <- paste(format(spc_period_start, format = "%b-%y"), format(spc_period_end, format = "%b-%y"), sep = " to ")
-
-  #for each value in dataframe, check if it is 0, if so exclude row
-  input_df$denominator <- if_else(input_df$denominator == 0, NA_real_ , input_df$denominator)
 
   # Calculate the limits using the qic package
   hqiu_spc <- qicharts2::qic(
-    x  = input_df$period_end,
-    y  = input_df$numerator,
-    n = input_df$denominator,
-    data = input_df,
-    chart = input_df$spccharttype[1],
-    multiply = input_df$multiplier[1],
+    x  = squis_spc$period_end,
+    y  = squis_spc$numerator,
+    n = squis_spc$denominator,
+    data = squis_spc,
+    chart = squis_spc$spccharttype[1],
+    multiply = squis_spc$multiplier[1],
     y.percent = TRUE)
 
   # Pull out the data from the ggplot2 object hqiu_spc
@@ -59,9 +58,9 @@ spc_create <- function(input_df, patterns_df = "No") {
     hqiu_theme()
 
   #checks if a patterns dataframe is input and if any patterns were detected
-  if(is.data.frame(patterns_df)){
+  if(is.data.frame(patterns_df) && !is_empty(squis_patterns[[1]])){
     #filters the patterns dataframe to see if the current input df is an spc to be displayed
-    filt_pat <- filter(patterns_df, Indicator == input_df$descriptionshort[1], Hospital == input_df$shorthospitalname[1])
+    filt_pat <- filter(patterns_df, Indicator == squis_spc$descriptionshort[1], Hospital == squis_spc$shorthospitalname[1])
     if(nrow(filt_pat)){
       #filter columns to only those that are related to patterns, x and y co-ordinates
       pattern_info <- filter(hqiu_spc_df, hqiu_spc_df$x %in% filt_pat[4:7]) %>%
@@ -73,7 +72,7 @@ spc_create <- function(input_df, patterns_df = "No") {
       #joins the two dataframes to now hold the x, y and pattern identifier
       pat_agg <- left_join(pat_info, pattern_info, by = c("value" = "x"))
 
-      if(input_df$betteris[1] == "Lower") nudge_y <- -max(hqiu_spc_df$y)/10 else nudge_y <- max(hqiu_spc_df$y)/10
+      if(squis_spc$betteris[1] == "Lower") nudge_y <- -max(hqiu_spc_df$y)/10 else nudge_y <- max(hqiu_spc_df$y)/10
       #enables rendering of Unicode symbols
       hqiu_spc_plot <- hqiu_spc_plot +
         #Adds the circle and tag around points
@@ -81,5 +80,5 @@ spc_create <- function(input_df, patterns_df = "No") {
         ggrepel::geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 10, nudge_y = nudge_y)
     }
   }
-  hqiu_spc_plot
+  suppressWarnings(print(hqiu_spc_plot))
 }
