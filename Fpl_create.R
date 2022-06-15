@@ -1,5 +1,5 @@
 #Input data frame filtered to indicator and current funnel, cut off value for the height of the y value added manually, to be added as a column in data
-fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE){
+fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE, brand_colour = "#00667B"){
   if (!nrow(input_df) | nrow(input_df) == 1) return()
   funnel_test <- FunnelPlotR::funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
                              group = input_df$establishment, limit=99,
@@ -48,7 +48,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
     # input_df$indicator[1] == "Q0148" ~ X, #MH Outcomes Consumer rated IP - Change in value
     # input_df$indicator[1] == "Q0130" ~ X, #MH % ED Attendances Admitted <4hrs - Proportion
     input_df$indicator[1] == "Q0020" ~ 50, #Perinatal Mortality
-    #input_df$indicator[1] == "Q0084" ~ X, #Post-partum Haemorrhage - Proportion
+    input_df$indicator[1] == "Q0084" ~ 0.15, #Post-partum Haemorrhage - Proportion
     input_df$indicator[1] == "Q0139" ~ 30, #Restraint Rates
     input_df$indicator[1] == "Q0140" ~ 30, #Seclusion Rates
     # input_df$indicator[1] == "Q0127" ~ X, #Staff Committed To Safety - Proportion, Higher is better

@@ -1,4 +1,4 @@
-spc_create <- function(input_df, patterns_df = "No") {
+spc_create <- function(input_df, patterns_df = "No", brand_colour = "#00667B") {
   squis_spc <- input_df
   #spc does not work with 0 or 1 rows
   if (!nrow(squis_spc) | nrow(squis_spc) == 1) return(cat("", "Skipped", squis_spc$establishment[1], squis_spc$indicator[1], sep = " "))
@@ -41,7 +41,7 @@ spc_create <- function(input_df, patterns_df = "No") {
     geom_line(aes(y = y), color = brand_colour, size = 0.5) +
     geom_point(aes(y = y),color = brand_colour, size = 4) +
     # Add the centre line
-    geom_line(aes (y = cl), color = centre_line_colour) +
+    geom_line(aes (y = cl), color = "black") +
     # Add the upper control limit
     geom_line(aes (y = ucl.95), color = brand_colour, linetype = 3, size = 1) +
     # Add the upper warning limit
@@ -77,7 +77,7 @@ spc_create <- function(input_df, patterns_df = "No") {
       hqiu_spc_plot <- hqiu_spc_plot +
         #Adds the circle and tag around points
         geom_point(data = pat_agg, mapping = aes(x = value, y = y), colour = "pink", size = 8, shape = 21, stroke = 2) +
-        ggrepel::geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 10, nudge_y = nudge_y)
+        ggrepel::geom_text_repel(data = pat_agg, mapping = aes(x = value, y = y), label = pat_agg$Pattern, size = 8, nudge_y = nudge_y)
     }
   }
   suppressWarnings(print(hqiu_spc_plot))

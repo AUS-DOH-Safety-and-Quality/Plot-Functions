@@ -1,7 +1,3 @@
-#Constants
-brand_colour <- "#00667B" #Teal HQIU Brand Colour from Comms (Corp Style Guide Alpha) 00 56 91 RGB
-centre_line_colour <- "black" 
-
 #apply to funnel to use theme , p + hqiu_funnel_theme()
 hqiu_funnel_theme <- function(){
   theme(
@@ -29,14 +25,14 @@ create_table <- function(...){
 }
 #Take input data frame from create_table function and adhere to DOH style guide - green header white text
 table_theme <- function(input_df){
-  flextable(input_df) %>%
+  flextable::flextable(input_df) %>%
     #fit size to whole screen
-    autofit() %>%
+    flextable::autofit() %>%
     #background colour
-    bg(part="header", bg = "#00667B") %>%
+    flextable::bg(part="header", bg = "#00667B") %>%
     #text colour
-    color(part = "header", color = "white") %>%
-    bold(part = "header")
+    flextable::color(part = "header", color = "white") %>%
+    flextable::bold(part = "header")
 }
 
 #Reduces NaN and Inf values to NA
