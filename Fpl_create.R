@@ -1,5 +1,10 @@
-#Input data frame filtered to indicator and current funnel, cut off value for the height of the y value added manually, to be added as a column in data
 fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE, brand_colour = "#00667B"){
+  #Input_df = data frame filtered to indicator and current_funnel
+  #highlight_hosp = shorthospitalname of site to individually highlight
+  #highlight_outlier = if false, do not highlight outliers with their threeletteracronym
+  #brand_colour = colour of control limits
+
+  #return early if 0 or 1 rows, cannot funnel with these
   if (!nrow(input_df) | nrow(input_df) == 1) return()
   funnel_test <- FunnelPlotR::funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
                              group = input_df$establishment, limit=99,
@@ -56,7 +61,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
     # input_df$indicator[1] == "Q0129" ~ X, #Staff Friends And Family - Proportion, Higher is better
     # input_df$indicator[1] == "Q0032" ~ X, #Staff Safe To Speak Up - Proportion, Higher is better
     # input_df$indicator[1] == "Q0126" ~ X, #Staff Treated Fairly - Proportion, Higher is better
-    input_df$indicator[1] == "Q0019" ~ 30, #Stillbirth
+    input_df$indicator[1] == "Q0019" ~ 10, #Stillbirth
     input_df$indicator[1] == "Q0121" ~ 30, #VBAC
     TRUE ~ 0)
 
@@ -84,6 +89,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
          caption = "Source: Healthcare Quality Intelligence Unit",
          x = "",
          y = "Value")+
+    #enables comma notation of x axis
     scale_x_continuous(labels = scales::comma)
   #input_df$y_axis_label[1]
   #check betteris, if higher, set highlight points to be points that are below the lower 99 limit, else,
@@ -112,20 +118,26 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
     #add a text geom, over the top of outliers, that is text relaying the name of the hospital for that outlier
     ggrepel::geom_text_repel(data = outlier_lookup, aes(x=x, y=y), label = outlier_lookup$threeletteracronym)
   }
+  #check if the hospital input is in the data provided
   if(highlight_hosp %in% unique(input_df$shorthospitalname)){
+    #filter the outlier label to only the input hospital
     highlight <- filter(outlier_label, shorthospitalname == highlight_hosp)
+    #join by establishment to find highlighted point's x and y values
     highlight_point <- left_join(highlight, fpl_plot$data, by = c("establishment" = "group"))
       fpl_plot <- fpl_plot +
+        #add circle around point
       geom_point(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), colour = "black", size = 5, shape = 1) +
-      ggrepel::geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, point.size = 7)
-    }
+      #add text of hospitalshortname
+      ggrepel::geom_text_repel(highlight_point, mapping = aes(x=denominator, y = rr*input_df$multiplier[1]), label = highlight_point$shorthospitalname, point.size = 7, size = 5)
+  }
+
   #cut off limits
   if (cut_off_min != 0){
-    return(fpl_plot + coord_cartesian(ylim = c(cut_off_min, 1)))
+    return(suppressWarnings(print(fpl_plot + coord_cartesian(ylim = c(cut_off_min, 1)))))
   }
 
   if (cut_off_max != 0){
-    return(fpl_plot + coord_cartesian(ylim = c(0, cut_off_max)))
+    return(suppressWarnings(print(fpl_plot + coord_cartesian(ylim = c(0, cut_off_max)))))
   }
-  fpl_plot
+  suppressWarnings(print(fpl_plot))
 }
