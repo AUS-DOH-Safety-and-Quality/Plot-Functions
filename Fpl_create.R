@@ -6,7 +6,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
 
   #return early if 0 or 1 rows, cannot funnel with these
   if (!nrow(input_df) | nrow(input_df) == 1) return()
-  funnel_test <- FunnelPlotR::funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
+  funnel <- FunnelPlotR::funnel_plot(denominator=input_df$denominator, numerator=input_df$numerator,
                              group = input_df$establishment, limit=99,
                              data_type = input_df$funnelcharttype[1], sr_method = "CQC", multiplier = input_df$multiplier[1],
                              draw_unadjusted = TRUE,
@@ -14,7 +14,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
                              label = NA,
                              highlight  = NA)
   #pulls out the data for the limits of the plot
-  lim_data <- funnel_test$limits_lookup
+  lim_data <- funnel$limits_lookup
   # Create the labels for our funnel plot
   funnel_period_start <- min(input_df$period_start)
   funnel_period_end   <- max(input_df$period_end)
@@ -71,9 +71,13 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
     input_df$indicator[1] == "Q0129" ~ 0.5, #Staff Friends And Family - Proportion, Higher is better
     input_df$indicator[1] == "Q0057" ~ 0.7, #Hand Hygiene - Higher is better
     TRUE ~ 0)
-    }
+  }
 
-  fpl_plot <- ggplot(funnel_test$plot$data, aes(x=denominator, y = funnel_test$plot$data$rr*input_df$multiplier[1]))+
+  if(input_df$y_axis_label[1] == "Rate" | input_df$descriptionshort[1] == "Vaginal birth (2) after C section"){
+    input_df$y_axis_label[1] <- paste("Rate per", input_df$multiplier[1], sep = " ")
+  }
+
+  fpl_plot <- ggplot(funnel$plot$data, aes(x=denominator, y = funnel$plot$data$rr*input_df$multiplier[1]))+
     hqiu_funnel_theme()+
     geom_point(colour = brand_colour) +
     geom_line(data = lim_data, aes(x=number.seq, y=ll95, linetype = "95%"), size = 1, colour = brand_colour)+
@@ -88,7 +92,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
          subtitle = date_range,
          caption = "Source: Healthcare Quality Intelligence Unit",
          x = "",
-         y = "Value")+
+         y = input_df$y_axis_label[1])+
     #enables comma notation of x axis
     scale_x_continuous(labels = scales::comma)
   #input_df$y_axis_label[1]
@@ -96,10 +100,10 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
   #if Lower, set it to points above the upper 99 limit
   if(input_df$betteris[1] == "Higher"){
     #if point value is less than the lower control limit flag the point
-    highlight_points <- ifelse(funnel_test$plot$data$rr*input_df$multiplier[1] < fpl_plot$data$LCL99,
-                               funnel_test$plot$data$rr*input_df$multiplier[1], NA)
-  }else highlight_points <- ifelse(funnel_test$plot$data$rr*input_df$multiplier[1] > fpl_plot$data$UCL99,
-                                   funnel_test$plot$data$rr*input_df$multiplier[1], NA)
+    highlight_points <- ifelse(funnel$plot$data$rr*input_df$multiplier[1] < fpl_plot$data$LCL99,
+                               funnel$plot$data$rr*input_df$multiplier[1], NA)
+  }else highlight_points <- ifelse(funnel$plot$data$rr*input_df$multiplier[1] > fpl_plot$data$UCL99,
+                                   funnel$plot$data$rr*input_df$multiplier[1], NA)
 
   #create a dataframe that holds the establishment and hospital names to serve as a lookup table
   #We only have the establishment code in the plot output so we need this to find the hospital name
@@ -107,7 +111,7 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
                               threeletteracronym = unique(input_df$threeletteracronym),
                               shorthospitalname = unique(input_df$shorthospitalname))
   #create a dataframe that holds the points on the graph, so that we can overlay them with a circle and hospital name
-  outlier_points <- data.frame(x = funnel_test$plot$data$denominator, y = highlight_points, establishment = funnel_test$plot$data$group) %>%
+  outlier_points <- data.frame(x = funnel$plot$data$denominator, y = highlight_points, establishment = funnel$plot$data$group) %>%
     #drop values that aren't outliers
     drop_na(y)
   #join the two tables
@@ -139,5 +143,5 @@ fpl_create <- function(input_df, highlight_hosp = "No", highlight_outlier = TRUE
   if (cut_off_max != 0){
     return(suppressWarnings(print(fpl_plot + coord_cartesian(ylim = c(0, cut_off_max)))))
   }
-  suppressWarnings(print(fpl_plot))
+  suppressMessages(suppressWarnings(print(fpl_plot)))
 }

@@ -35,14 +35,13 @@ spc_create <- function(input_df, patterns_df = "No", brand_colour = "#00667B") {
     if(hqiu_spc_df$lcl.95[1] < 0) hqiu_spc_df$lcl.95 <- 0
     if(hqiu_spc_df$lcl[1] < 0) hqiu_spc_df$lcl <- 0
   }
-  if(squis_spc$y_axis_label[1] == "Percentage"){
-    propToPercent <- c("y", "cl", "ucl.95", "ucl", "lcl.95", "lcl")
-    for(i in propToPercent){
-      hqiu_spc_df[i] <-  hqiu_spc_df[i]*100 %>%
-        round()
-    }
-  }
-  if(squis_spc$y_axis_label[1] == "Rate" || squis_spc$descriptionshort[1] == "Vaginal birth (2) after C section"){
+  # if(squis_spc$descriptionshort[1] == "Vaginal birth (2) after C section"){
+  #   propToPercent <- c("y", "cl", "ucl.95", "ucl", "lcl.95", "lcl")
+  #   for(i in propToPercent){
+  #     hqiu_spc_df[i] <-  hqiu_spc_df[i]*100 %>%
+  #       round()
+  #   }
+  if(squis_spc$y_axis_label[1] == "Rate" | squis_spc$descriptionshort[1] == "Vaginal birth (2) after C section"){
     squis_spc$y_axis_label[1] <- paste("Rate per", squis_spc$multiplier[1], sep = " ")
   }
   hqiu_spc_plot <- ggplot(hqiu_spc_df, aes(x = x)) +
