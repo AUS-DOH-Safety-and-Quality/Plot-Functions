@@ -47,3 +47,16 @@ clear_zero <- function(input_df){
   input_df[is.na(input_df)] <- 0
   return(input_df)
 }
+
+#Add S
+addSByInput <- function(object)if(object!=1)"s"
+
+#grabs funnel data for outlier detection
+generate_fpl_values <- function(squis_test){
+  #Create Funnel
+  ind_funnel <- suppressWarnings(FunnelPlotR::funnel_plot(denominator=squis_test$denominator, numerator=squis_test$numerator,
+                                                          group = squis_test$establishment, limit=99,
+                                                          data_type = squis_test$funnelcharttype[1], sr_method = "CQC", multiplier = squis_test$multiplier[1],
+                                                          draw_adjusted = FALSE))
+  return(ind_funnel$plot$data)
+}
